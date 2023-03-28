@@ -1,6 +1,6 @@
 import numpy as np 
 import json
-
+from naive import brute_force_sol
 
 def generate_test_cases(n, min_players, max_players, min_specters, max_specters, min_score, max_score):
     """ Generate test cases to save them to json format """
@@ -13,12 +13,13 @@ def generate_test_cases(n, min_players, max_players, min_specters, max_specters,
         specters_points = np.random.randint(min_score, max_score, size=players_count).tolist()
         players_points = np.random.randint(min_score, max_score, size=n*players_count)
         players_points = players_points.reshape(n,players_count).tolist()
-        
+        sol = brute_force_sol(n,players_count,specters_count,players_points,specters_points)
         test_cases.append({
             'players_count': players_count,
             'specters_count': specters_count,
             'players_points': players_points,
-            'specters_points': specters_points
+            'specters_points': specters_points,
+            'result' : sol
         })
     
     return test_cases
