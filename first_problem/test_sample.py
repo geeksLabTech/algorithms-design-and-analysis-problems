@@ -8,14 +8,16 @@ def test_brute_force():
     players_points = [
         [2,1,0],
         [0,0,0],
-        [1,2,-1],
-        [0,0,2],
+        [1,2,0],
+        [0,0,0],
         [2,0,0],
         [0,0,0]
     ]
-    
-    specters_points = [-1, 2, 0, 4, 1, 2]
+    # print(players_points)
+    specters_points = [0, 2, 0, 4, 1, 2]
+    # print(specters_points)
     solution = brute_force_sol(n, p, k, players_points, specters_points)
     assert solution == 10
     print('Solution:', solution)
 
+test_brute_force()

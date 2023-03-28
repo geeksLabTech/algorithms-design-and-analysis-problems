@@ -10,9 +10,11 @@ def generate_test_cases(n, min_players, max_players, min_specters, max_specters,
         n = 30
         players_count = np.random.randint(min_players,max_players)
         specters_count = np.random.randint(min_specters,max_specters)
-        specters_points = np.random.randint(min_score, max_score, size=players_count).tolist()
+        specters_points = np.random.randint(min_score, max_score, size=n).tolist()
+        # print(specters_points, 'point rcs' '\n')
         players_points = np.random.randint(min_score, max_score, size=n*players_count)
         players_points = players_points.reshape(n,players_count).tolist()
+        # print(players_points, 'kkk')
         sol = brute_force_sol(n,players_count,specters_count,players_points,specters_points)
         test_cases.append({
             'players_count': players_count,
