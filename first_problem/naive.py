@@ -14,7 +14,6 @@ class Team:
         
         self.selected_players: list[tuple[int,int]] = []
         self.selected_specters: list[int] = []
-        # self.specters_score = specters_score
         self.p = p
         self.k = k 
         self.current_players = 0 
@@ -67,7 +66,6 @@ def __brute_force(solution: Team, best_score_finded: int) -> int:
             
         return best_score_finded
     
-    # print('current, ', solution.current_players, solution.current_specters)
     for i in range(len(solution.score_per_position)):
         if solution.is_person_assigned(i):
             continue
@@ -87,10 +85,7 @@ def brute_force_sol(n: int, p: int, k: int, players_points, specters_points):
     players_points = np.array(players_points)
     specters_points = np.array(specters_points)
     specters_points_column = specters_points.reshape(1,specters_points.size).transpose()
-    print(players_points)
-    print(specters_points_column)
     new_table = np.hstack((players_points, specters_points_column))
-    print('new table, ', new_table)
     team = Team(n, p, k, new_table)
     min_value = np.min(players_points.min(), specters_points.min()) 
     best_score = __brute_force(team, min_value)
