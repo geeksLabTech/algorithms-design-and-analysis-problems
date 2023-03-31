@@ -23,7 +23,6 @@ def get_default_vertex_labeling(G_matrix, L, R):
 
 def greedy_bipartite_matching(L, R, matrix, L_h, R_h) -> set[tuple]:
     # R_set = set(R)
-    print('check', len(L) + len(R))
     matched_in_R = [False] * (len(L))
     M: set[tuple] = set()
     for v in range(len(L)):
@@ -84,41 +83,17 @@ def calculate_delta(Fl: set[int], R_Fr_difference, L_h, R_h, matrix):
     
     return delta
 
-def reconstruct_path(pi_L, pi_R, matched_l, matched_r):
-    last_node = None 
-    # path = set()
-
-    for i in range(len(pi_R)-1, -1, -1):
-        print('siiiuuu', i)
-        if pi_R[i] is not None:
-            
-            last_node = i
-            break
-
-    print('paths')
-    print(pi_L)
-    print(pi_R)
-    
-    r = last_node
-    print(r)
+def reconstruct_path(pi_L, pi_R, last_discovered_in_r):
+    r = last_discovered_in_r
     l = pi_R[r]
     path = {(l,r)}
-    # matched_r[r] = l
     while pi_L[l] is not None:
 
         r = pi_L[l]
-        # matched_r[r] = None
         path.add((l, r))  
         l = pi_R[r]
         path.add((l, r))
-        # matched_r[r] = l
-        # matched_l[l] = True
-    # matched_l[l] = True
-    print(' ')
-    print('constructed path: ', path)
-    print('matched_L', matched_l)
-    print('matched_R', matched_r)
-    print()
+        
     return path
     
 
@@ -127,22 +102,20 @@ def find_augmenting_path(L: set[int], R: set[int], L_h, R_h, M: set[tuple], matr
 
     Fl = set()
     Fr = set()
-    E_Mh_vertex = convert_edges_set_to_vertex_set(M)
     total_vertex = set(range(len(L)))
     pi_L = [None] * (len(L))
     pi_R = [None] * (len(R))
-    unmatched_vertex = total_vertex.difference(E_Mh_vertex)
+
     for v in total_vertex:
         if not matched_l[v]:
             Q.append(VertexInQueue(v, False))
             Fl.add(v)
 
-    print('total', total_vertex)
-    print('emh', E_Mh_vertex)
     found_augmenting_path = False
-
+    last_discovered_in_r = None
     while not found_augmenting_path:
         vertex_item = None
+        
         try:
             vertex_item = Q.popleft()
         except IndexError: 
@@ -156,21 +129,18 @@ def find_augmenting_path(L: set[int], R: set[int], L_h, R_h, M: set[tuple], matr
             for v in Fr:
                 R_h[v] += delta
 
-            # DUDA 
-            print('total : ', total_vertex)
-            print('shape', matrix.shape)
+            
             for l in total_vertex:
                 if found_augmenting_path:
                     break
                 
                 for r in total_vertex:
                     if r not in Fr and old_L_h[l] + old_R_h[r] > matrix[l,r] and L_h[l] + R_h[r] == matrix[l,r] and (l,r) not in M:
-                        print('no creo')
-
                         pi_R[r] = l
 
                         if matched_r[r] is None:
                             found_augmenting_path = True
+                            last_discovered_in_r = r
                             break
                         else:
                             Q.append(VertexInQueue(r, True))
@@ -180,7 +150,6 @@ def find_augmenting_path(L: set[int], R: set[int], L_h, R_h, M: set[tuple], matr
             if found_augmenting_path:
                 break
         
-        print('veo')
         if vertex_item is None:
             vertex_item = Q.popleft()
         if vertex_item.is_left:
@@ -191,24 +160,22 @@ def find_augmenting_path(L: set[int], R: set[int], L_h, R_h, M: set[tuple], matr
         
         else:
             for r in total_vertex:
-                # print(r not in Fr)
-                # print(L_h[r] + R_h == matrix[vertex_item.v,r])
-                # print((vertex_item.v, r) not in M)
                 if r not in Fr and L_h[vertex_item.v] + R_h[r] == matrix[vertex_item.v,r] and (vertex_item.v, r) not in M:
                     pi_R[r] = vertex_item.v
                     if matched_r[r] is None:
+                        last_discovered_in_r = r
                         found_augmenting_path = True
                         break
                     else:
                         Q.append(VertexInQueue(r, True))
                         Fr.add(r)
 
-    return reconstruct_path(pi_L, pi_R, matched_l, matched_r)
+    return reconstruct_path(pi_L, pi_R, last_discovered_in_r)
         
 
 def update_matchings_from_M(M, n, matched_l, matched_r):
-    # matched_l = [False] * n
-    # matched_r = [None] * n
+    matched_l = [False] * n
+    matched_r = [None] * n
     for (l, r) in M:
         matched_l[l] = True
         matched_r[r] = l
@@ -220,11 +187,6 @@ def hungarian_algorithm(G_matrix: np.ndarray):
     R = np.array([i for i in range(G_matrix.shape[1])], dtype=int)
     L_h, R_h = get_default_vertex_labeling(G_matrix, L, R)
     M = greedy_bipartite_matching(L, R, G_matrix, L_h, R_h)
-    # E_h = get_equality_subgraph_edges(G_matrix, L_h, R_h)
-    # E_Mh = get_directed_equality_subgraph_edges(E_h, M)
-    print('lh', L_h)
-    print('R_h', R_h)
-    print('initial_matching: ', M )
     matched_l = [False] * (len(L)) 
     matched_r = [None] * (len(R)) 
     
@@ -234,9 +196,7 @@ def hungarian_algorithm(G_matrix: np.ndarray):
         matched_l, matched_r = update_matchings_from_M(M, len(L), matched_l, matched_r)
         path = find_augmenting_path(L, R, L_h, R_h, M, G_matrix, matched_l, matched_r)
         M ^= path
-        print('M current', M)
-    print('len', len(M))
-    print('M', M)
+    
     return M
 
 
@@ -259,9 +219,8 @@ def solve(n, p, k, players_points, specters_points):
     zero_column = np.zeros(len(specters_points), dtype=int)
     zero_column = zero_column.reshape(1, zero_column.size)
     while players_points.shape[0] < n:
-        print('sip')
         players_points = np.vstack((players_points, zero_column))
-    print('matrix ', players_points)
+    
     perfect_matching = hungarian_algorithm(players_points)
     return sum([players_points[l,r] for (l, r) in perfect_matching])
    
