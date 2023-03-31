@@ -59,7 +59,6 @@ class Team:
 
 def __brute_force(solution: Team, best_score_finded: int) -> int:
     if solution.is_team_complete():
-        # print('best:', solution.total_score)
         if solution.total_score > best_score_finded:
             # best_solution_finded = solution.copy()
             best_score_finded = solution.total_score
@@ -71,7 +70,6 @@ def __brute_force(solution: Team, best_score_finded: int) -> int:
             continue
         
         for j in range(len(solution.score_per_position[i])):
-            # print(j)
             if solution.is_position_assigned(j) or not solution.is_possible_to_add(i, j):
                 continue
 
@@ -84,12 +82,8 @@ def __brute_force(solution: Team, best_score_finded: int) -> int:
 def brute_force_sol(n: int, p: int, k: int, players_points, specters_points):
     players_points = np.array(players_points)
     specters_points = np.array(specters_points)
-    # print(players_points, 'adentro')
     specters_points_column = specters_points.reshape(1,specters_points.size)
-    # print(specters_points_column.shape, 'dentro')
-    # print(players_points.shape, 'mmm')
     new_table = np.vstack((players_points, specters_points_column)).transpose()
-    print('mm', new_table)
     team = Team(n, p, k, new_table)
     min_value = 0
     best_score = __brute_force(team, min_value)
