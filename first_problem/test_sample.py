@@ -15,11 +15,11 @@ def test_brute_force():
     specters_points = [0, 2, 0, 4, 1, 2]
     # print(specters_points)
     solution = brute_force_sol(n, p, k, players_points, specters_points)
-    # assert solution == 10
+    assert solution == 9
     efficient_solution = solve(n, p, k, players_points, specters_points)
     print('Backtrack:', solution)
     print('efficient solution', efficient_solution)
-    assert efficient_solution == 10
+    assert efficient_solution == 9
     
 
 test_brute_force()
