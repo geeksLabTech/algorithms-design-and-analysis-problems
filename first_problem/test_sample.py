@@ -1,6 +1,7 @@
 from naive import brute_force_sol
 import pytest
-from hungarian_algorithm import solve
+# from hungarian_algorithm import solve
+from optimized_hungarian_algorithm import solve
 
 def test_brute_force():
     n = 6

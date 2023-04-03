@@ -3,16 +3,11 @@ import json
 
 from matplotlib.font_manager import json_dump
 from naive import brute_force_sol
-from hungarian_algorithm import solve
+# from hungarian_algorithm import solve
+from optimized_hungarian_algorithm import solve
 import numpy as np
+from utils import load_json
 
-def load_json(json_name):
-    data = {}
-
-    with open(json_name) as file:
-        data = json.load(file)
-
-    return data
 
 def evaluate(data, id: int, return_dict, use_brute_force=True):
     print(f'started proccess {id}')
@@ -37,8 +32,8 @@ def evaluate(data, id: int, return_dict, use_brute_force=True):
             print()
         return_dict[id] = (naive, hungarian, hungarian==naive)
     # print(f'finished brute force {id}')
-    
-    return_dict[id] = hungarian
+    else:
+        return_dict[id] = hungarian
     print(f'finished proccess {id}')
     
     
@@ -82,4 +77,4 @@ def run_evaluator(json_name, dump_to_json=True, use_brute_force=True):
 
 
 
-run_evaluator('test_cases.json', use_brute_force=False)
+run_evaluator('generated_cases_for_testing.json', use_brute_force=False)
