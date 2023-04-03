@@ -1,5 +1,4 @@
-
-from os import path
+from datetime import datetime
 import numpy as np
 from collections import deque
 import math
@@ -34,43 +33,43 @@ def greedy_bipartite_matching(L, R, matrix, L_h, R_h) -> set[tuple]:
     
     return M
 
-def get_equality_subgraph_edges(G_matrix, L_h, R_h) -> set[tuple]:
-    edges: set[tuple] = set()
+# def get_equality_subgraph_edges(G_matrix, L_h, R_h) -> set[tuple]:
+#     edges: set[tuple] = set()
 
-    for i in range(len(L_h)):
-        for j in range(len(R_h)):
-            if L_h[i] + R_h[j] == G_matrix[i][j]:
-                edges.add((i,j))
+#     for i in range(len(L_h)):
+#         for j in range(len(R_h)):
+#             if L_h[i] + R_h[j] == G_matrix[i][j]:
+#                 edges.add((i,j))
     
-    return edges
+#     return edges
 
-def get_directed_equality_subgraph_edges(E_h: set[tuple], M: set[tuple]) -> set[tuple]:
-    difference = E_h.difference(M)
-    inverted_edges = (tuple(reversed(e)) for e in M)
-    edges = difference.union(inverted_edges)
+# def get_directed_equality_subgraph_edges(E_h: set[tuple], M: set[tuple]) -> set[tuple]:
+#     difference = E_h.difference(M)
+#     inverted_edges = (tuple(reversed(e)) for e in M)
+#     edges = difference.union(inverted_edges)
 
-    return edges
+#     return edges
     
 
-def is_perfect_matching(total_vertex: int ,M: set[tuple]):
-    visited = set()
-    covered_vertex = 0
-    for v in M:
-        if v[0] in visited or v[1] in visited:
-            return False
-        visited.add(v[0])
-        visited.add(v[1])
-        covered_vertex+=2
+# def is_perfect_matching(total_vertex: int ,M: set[tuple]):
+#     visited = set()
+#     covered_vertex = 0
+#     for v in M:
+#         if v[0] in visited or v[1] in visited:
+#             return False
+#         visited.add(v[0])
+#         visited.add(v[1])
+#         covered_vertex+=2
 
-    return covered_vertex == total_vertex
+#     return covered_vertex == total_vertex
 
-def convert_edges_set_to_vertex_set(edges: set[tuple]) -> set[int]:
-    vertex_set = set()
-    for e in edges:
-        vertex_set.add(e[0])
-        vertex_set.add(e[1])
+# def convert_edges_set_to_vertex_set(edges: set[tuple]) -> set[int]:
+#     vertex_set = set()
+#     for e in edges:
+#         vertex_set.add(e[0])
+#         vertex_set.add(e[1])
 
-    return vertex_set
+#     return vertex_set
 
 def calculate_delta(Fl: set[int], R_Fr_difference, L_h, R_h, matrix):
     # difference = R.difference(Fr)
@@ -110,7 +109,7 @@ def find_augmenting_path(L: set[int], R: set[int], L_h, R_h, M: set[tuple], matr
         if not matched_l[v]:
             Q.append(VertexInQueue(v, False))
             Fl.add(v)
-
+    
     found_augmenting_path = False
     last_discovered_in_r = None
     while not found_augmenting_path:
@@ -119,6 +118,7 @@ def find_augmenting_path(L: set[int], R: set[int], L_h, R_h, M: set[tuple], matr
         try:
             vertex_item = Q.popleft()
         except IndexError: 
+            
             old_L_h = np.array(L_h)
             old_R_h = np.array(R_h)
             R_Fr_difference = total_vertex.difference(Fr)
@@ -152,6 +152,7 @@ def find_augmenting_path(L: set[int], R: set[int], L_h, R_h, M: set[tuple], matr
         
         if vertex_item is None:
             vertex_item = Q.popleft()
+        start = datetime.now()
         if vertex_item.is_left:
             l = matched_r[vertex_item.v]
             pi_L[l] = vertex_item.v
@@ -170,6 +171,9 @@ def find_augmenting_path(L: set[int], R: set[int], L_h, R_h, M: set[tuple], matr
                         Q.append(VertexInQueue(r, True))
                         Fr.add(r)
 
+    
+        end = datetime.now()
+        # print(f'como puede serrr {(end - start).total_seconds()} seconds')
     return reconstruct_path(pi_L, pi_R, last_discovered_in_r)
         
 
@@ -185,6 +189,7 @@ def update_matchings_from_M(M, n, matched_l, matched_r):
 def hungarian_algorithm(G_matrix: np.ndarray):
     L = np.array([i for i in range(G_matrix.shape[0])], dtype=int)
     R = np.array([i for i in range(G_matrix.shape[1])], dtype=int)
+    
     L_h, R_h = get_default_vertex_labeling(G_matrix, L, R)
     M = greedy_bipartite_matching(L, R, G_matrix, L_h, R_h)
     matched_l = [False] * (len(L)) 
