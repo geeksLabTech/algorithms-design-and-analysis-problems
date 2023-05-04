@@ -1,4 +1,12 @@
+import json
 
+def load_json(json_name):
+    data = {}
+
+    with open(json_name) as file:
+        data = json.load(file)
+
+    return data
 def is_difference_one(x: int, y: int):
     return abs(x - y) == 1
 
