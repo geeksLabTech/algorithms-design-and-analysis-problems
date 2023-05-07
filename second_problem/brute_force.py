@@ -12,7 +12,6 @@ def check(arr: list[int], indexes: list[int]):
 
 
 def allSubsequences(arr: list[int], index: int, subarr: list[int]):
-
     if index == len(arr):
         if len(subarr) != 0:
             return subarr
@@ -25,6 +24,8 @@ def allSubsequences(arr: list[int], index: int, subarr: list[int]):
                                   subarr+[index])
         if subarr2 and check(arr, subarr2):
             all_subarr.append(subarr2)
+    # all_subarr.clear()
+    
 
   
 arr = [1,3,4,8,5,10,5,78,4,2]
@@ -51,12 +52,15 @@ def choose_longest(arr_l: list[int]):
 
 def execute_brute_force(array):
     arr = array
+    all_subarr.clear()
     allSubsequences(arr, 0, [])
-    print(arr, 'arr')
-    return choose_longest(all_subarr)
+    solve = choose_longest(all_subarr)
+    all_subarr.clear()
+    print(all_subarr,'before')
+    return solve
 
-
-print(execute_brute_force([1,3,4,8,5,10,5,78,4,13]))
+print(execute_brute_force([1,2,3,7,8,2]))
+# print(execute_brute_force([1,3,4,8,5,10,5,78,4,13]))
 
 
 
