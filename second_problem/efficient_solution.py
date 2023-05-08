@@ -43,11 +43,13 @@ def solve(notes: list[int]):
     adjacents[fourth_sink].append(edges[-1])
     adjacents[super_sink].extend([edges[-4], edges[-3], edges[-2], edges[-1]])
 
-    print('inicio', len(adjacents), len(edges))
+    # print('inicio', len(adjacents), len(edges))
     mcmf = MinCostMaxFlow(n=len(adjacents), edges=edges, adjacents=adjacents, source=source, sink=super_sink)
     result = mcmf.calc_min_cost_max_flow()
     print(f'max_flow: {result[0]}, min_cost: {result[1]}')
+    return result[0], abs(result[1])
 
 
-
-solve([1,3,4,7,8,2])
+# solve([1,3,4,7,8,2])
+# solve([12, 38, 13, 41, 2, 39])
+solve([9, 37, 31, 17, 9])

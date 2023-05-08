@@ -12,17 +12,17 @@ def evaluate(data, id: int, return_dict, use_brute_force=True):
     n = data['n']
     shortest_path = solve(n)
     if use_brute_force:
-        naive = execute_brute_force(n)
-        if shortest_path != naive:
+        naive = execute_brute_force(n)[0]
+        if shortest_path[1] != naive:
             print()
-            print(f' shortest_path{shortest_path}, naive {naive}')
+            print(f' shortest_path {shortest_path[1]}, naive {naive}')
+            print('flow is ', shortest_path[0])
             print(n)
-            
             print()
-        return_dict[id] = (naive, shortest_path, shortest_path == naive)
+        return_dict[id] = (naive, shortest_path[1], shortest_path[1] == naive, n)
     # print(f'finished brute force {id}')
     else:
-        return_dict[id] = shortest_path
+        return_dict[id] = shortest_path[1]
     print(f'finished proccess {id}')
 
 
@@ -45,14 +45,19 @@ def run_evaluator(json_name, dump_to_json=True, use_brute_force=True):
         final_list = []
         passed = 0
         
-        for i in range(len(values_list)):
-            if values_list[i][2]:
-                passed += 1
-            else:
-                final_list.append(values_list[i])
-        print(f'passed {passed} out of {len(values_list)}')
-        print(f'failed {len(final_list)} out of {len(values_list)}')
+        for i in range(len(return_dict.values())):
+            if int(values_list[i][2]) == 1:
+                passed+=1
+            final_list.append({
+                'naive': int(values_list[i][0]),
+                'efficient': int(values_list[i][1]),
+                'Equal': int(values_list[i][2]),
+                'n': values_list[i][3]
+            })
+        
+        print(f'passed {passed} cases of {len(data)}')
         if dump_to_json:
-            json_dump(final_list, open('failed_tests.json', 'w'))
+            json.dump(final_list, open('results.json', 'w'))
+        return final_list
 
 

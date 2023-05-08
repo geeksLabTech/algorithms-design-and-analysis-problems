@@ -3,6 +3,7 @@ import json
 import math
 import heapq
 import select
+from typing import Self
 
 BIG_INT: int = 1000000000000000
 
@@ -14,6 +15,8 @@ def load_json(json_name):
         data = json.load(file)
 
     return data
+
+
 def is_difference_one(x: int, y: int):
     return abs(x - y) == 1
 
@@ -54,6 +57,12 @@ class Edge:
 
     def get_cost(self, u: int):
         return self._cost if u == self.origin else -self._cost
+    
+    def __eq__(self, other: Self) -> bool:
+        return self.origin == other.origin and self.destiny == other.destiny
+
+    def __hash__(self) -> int:
+        return hash((self.origin, self.destiny))
 
 def build_graph(notes: list[int]):
     adjacents: dict[int, list[Edge]] = {}
@@ -70,8 +79,10 @@ def build_graph(notes: list[int]):
                 adjacents[i].append(e)
                 adjacents[j].append(e)
                 edges.append(e)
-
+                # print('edges ', notes[i], notes[j])
+    # print('initial edges', edges)
     return edges, adjacents
+    
 
 def connect_source_and_create_duplicates(edges: list[Edge], adjacents: dict[int, list[Edge]], source: int, index_to_start_duplicates: int):
     adjacents[source] = []
@@ -79,17 +90,30 @@ def connect_source_and_create_duplicates(edges: list[Edge], adjacents: dict[int,
     duplicates: list[int] = []
     for i in range(source):
         if i != source:
+            duplicate_edge = Edge(origin=i, destiny=index_to_start_duplicates, capacity=1, cost=0, flow=0)
+            out_edges_of_duplicate = list(filter(lambda e: e.origin == i, adjacents[i]))
+            adjacents[index_to_start_duplicates] = [Edge(origin=index_to_start_duplicates, destiny=k.destiny, capacity=1, cost=-1) for k in out_edges_of_duplicate] + [duplicate_edge]
+            adjacents[i] = list(filter(lambda e: e.origin != i, adjacents[i])) + [duplicate_edge]
+            for j in edges:
+                if j in out_edges_of_duplicate:
+                    edges.remove(j)
+            edges.append(duplicate_edge)
+            edges.extend(adjacents[index_to_start_duplicates])
+            # edges = list(set(edges) - set(out_edges_of_duplicate)) + [duplicate_edge]
+            duplicates.append(index_to_start_duplicates)
+            index_to_start_duplicates+=1
+
             e = Edge(origin=source, destiny=i, capacity=1, cost=-1, flow=0)
             adjacents[source].append(e)
             adjacents[i].append(e)
             edges.append(e)
 
-            duplicate_edge = Edge(origin=i, destiny=index_to_start_duplicates, capacity=1, cost=0, flow=0)
-            adjacents[index_to_start_duplicates] = [duplicate_edge]
-            adjacents[i].append(duplicate_edge)
-            edges.append(duplicate_edge)
-            duplicates.append(index_to_start_duplicates)
-            index_to_start_duplicates+=1
+            # duplicate_edge = Edge(origin=i, destiny=index_to_start_duplicates, capacity=1, cost=0, flow=0)
+            # adjacents[index_to_start_duplicates] = [duplicate_edge]
+            # adjacents[i].append(duplicate_edge)
+            # edges.append(duplicate_edge)
+            # duplicates.append(index_to_start_duplicates)
+            # index_to_start_duplicates+=1
 
     return edges, adjacents, duplicates
 
@@ -106,7 +130,6 @@ def bellman_ford(n: int, edges: list[Edge], source: int, sink: int) -> tuple[boo
     if dist[sink] >= BIG_INT:
         return False, dist
      
-    print('belman ds', dist)
     return True, dist
 
 
