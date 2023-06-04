@@ -14,7 +14,7 @@ class Edge:
         self.source = source
         self.dest = dest
         self.is_negative = is_negative
-
+        self.pheromone = 0
 
 class Node:
     def __init__(self, id: int, total_nodes_ids) -> None:
@@ -51,3 +51,41 @@ class Node:
     
     def __hash__(self) -> int:
         return hash(self.id)
+
+
+def add_node_to_solution(node: Node, current_nodes: list[Node], mask: list[bool], dependencies: dict[int, list[Node]]):
+    nodes_to_process: list[Node] = []
+    nodes_to_process.append(node)
+    while len(nodes_to_process) > 0:
+        # print(len(nodes_to_process))
+        current = nodes_to_process.pop()
+        if mask[current.id]:
+            continue
+
+        mask[current.id] = True 
+        current_nodes.append(current)
+        # edges_for_print = [(e.source.id, e.dest.id, e.is_negative) for e in current.edges]
+        # print('look edges: ',  edges_for_print)
+        nodes_that_think_negative = [e.source for e in current.edges if e.dest == current and e.is_negative]
+        dependencies[current.id] = nodes_that_think_negative
+        nodes_to_process.extend(nodes_that_think_negative)
+
+    return current_nodes, mask, dependencies
+
+
+def remove_node_from_solution(node: Node, current_nodes: list[Node], mask: list[bool], dependencies: dict[int, list[Node]]):
+    nodes_to_process: list[Node] = []
+    nodes_to_process.append(node)
+    while len(nodes_to_process) > 0:
+        current = nodes_to_process.pop()
+        # if not mask[current.id]:
+        #     continue
+
+        mask[current.id] = False 
+        nodes_to_remove = dependencies[current.id]
+        nodes_to_remove.extend(current.get_negative_adjacent_nodes())
+        nodes_to_process.extend(nodes_to_remove)
+        dependencies[current.id] = []
+        current_nodes.remove(current)
+    
+    return current_nodes, mask, dependencies
