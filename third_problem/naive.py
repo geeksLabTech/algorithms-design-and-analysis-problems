@@ -1,20 +1,27 @@
-
 from utils import Node, Student, add_node_to_solution, remove_node_from_solution
-    
+
 
 best_k: int = 0
 best_combination: list[int] = []
 
 
-
-def backtrack(k: int, current_nodes: list[Node], mask: list[bool], dependencies: dict[int, list[Node]]):
+def backtrack(
+    k: int,
+    current_nodes: list[Node],
+    mask: list[bool],
+    dependencies: dict[int, list[Node]],
+):
     if len(current_nodes) > k:
-        return 
-    
+        return
+
     global best_k
     global best_combination
     # print(f'len current', len(current_nodes), k)
-    if len(current_nodes) <= k and len(current_nodes) > 0 and len(current_nodes) > best_k:
+    if (
+        len(current_nodes) <= k
+        and len(current_nodes) > 0
+        and len(current_nodes) > best_k
+    ):
         best_k = len(current_nodes)
         best_combination = [node.id for node in current_nodes]
 
@@ -25,12 +32,16 @@ def backtrack(k: int, current_nodes: list[Node], mask: list[bool], dependencies:
     all_adjacents = set()
     for n in current_nodes:
         all_adjacents.union(n.get_adjecent_nodes())
-    
+
     for n in all_adjacents:
-        if not mask[n.id]: 
-            current_nodes, mask, dependencies = add_node_to_solution(n, current_nodes, mask, dependencies)
+        if not mask[n.id]:
+            current_nodes, mask, dependencies = add_node_to_solution(
+                n, current_nodes, mask, dependencies
+            )
             backtrack(k, current_nodes, mask, dependencies)
-            current_nodes, mask, dependencies = remove_node_from_solution(n, current_nodes, mask, dependencies)
+            current_nodes, mask, dependencies = remove_node_from_solution(
+                n, current_nodes, mask, dependencies
+            )
 
 
 def brute_force(nodes: list[Node], k: int):
@@ -69,6 +80,5 @@ def solve(students: list[Student], k: int):
         node.add_neutral_edges(nodes)
 
     results = brute_force(nodes, k)
-    print(f'best_k: {results[0]}, best_combination: {results[1]}')
+    print(f"best_k: {results[0]}, best_combination: {results[1]}")
     return results
-
