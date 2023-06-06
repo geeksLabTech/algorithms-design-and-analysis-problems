@@ -14,7 +14,7 @@ class Edge:
         self.source = source
         self.dest = dest
         self.is_negative = is_negative
-        self.pheromone = 0
+        self.pheromone: float = 0.0
 
 class Node:
     def __init__(self, id: int, total_nodes_ids) -> None:
@@ -45,6 +45,11 @@ class Node:
     
     def get_negative_adjacent_nodes(self):
         return [e.dest for e in self.edges if e.source == self and e.is_negative]
+
+    
+    def get_outgoing_edges(self):
+        return [e for e in self.edges if e.dest != self]
+
 
     def __eq__(self, __value: Self) -> bool:
         return self.id == __value.id
