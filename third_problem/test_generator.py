@@ -13,11 +13,11 @@ def generator(cases: int):
 
     while cases > 0:
         students_number = random.randint(5, 50)
-        k = random.randint(3, students_number - 1)
+        k = random.randint(3, students_number-1)
         students_id = np.arange(students_number)
         students: list[Student] = []
         for i in students_id:
-            opinions_number = random.randint(0, students_number - 1)
+            opinions_number = random.randint(0, students_number//2)
             opinions = np.random.choice(
                 a=students_number, replace=False, size=opinions_number
             ).tolist()
@@ -45,25 +45,25 @@ def verify_solution(students: list[Student], k: int, result: list[int]):
 
     return True
 
-def compare_aproximation(data):
-    dataframe = pd.DataFrame(data, columns=['Tests', 'BruteForce', 'Aproximation'])
-    sns.set_theme(style="whitegrid")
+# def compare_aproximation(data):
+    
+#     sns.set_theme(style="whitegrid")
 
-    # Initialize the matplotlib figure
-    f, ax = plt.subplots(figsize=(6, 15))
+#     # Initialize the matplotlib figure
+#     f, ax = plt.subplots(figsize=(6, 15))
 
-    sns.set_color_codes("pastel")
-    sns.barplot(x="BruteForce", y="Tests", data=dataframe,
-                label="Total", color="b")
+#     sns.set_color_codes("pastel")
+#     sns.barplot(x="BruteForce", y="Tests", data=data,
+#                 label="Total", color="b")
 
-    sns.set_color_codes("muted")
-    sns.barplot(x="Aproximation", y="Tests", data=dataframe,
-                label="Aproximation", color="b")
+#     sns.set_color_codes("muted")
+#     sns.barplot(x="Aproximation", y="Tests", data=data,
+#                 label="Aproximation", color="b")
 
-    ax.legend(ncol=2, loc="lower right", frameon=True)
-    ax.set(xlim=(0, 24), ylabel="",
-    )
-    sns.despine(left=True, bottom=True)
+#     ax.legend(ncol=2, loc="lower right", frameon=True)
+#     ax.set(xlim=(0, 24), ylabel="",
+#     )
+#     sns.despine(left=True, bottom=True)
 
 
 def run_test_cases(cases: int, seed: int):
@@ -90,8 +90,10 @@ def run_test_cases(cases: int, seed: int):
     else:
         print("yeah, all seems good")
 
-    compare_aproximation(registry)
+    dataframe = pd.DataFrame(registry, columns=['Tests', 'BruteForce', 'Aproximation'])
+    dataframe.to_csv('dataframe.csv')
+    # compare_aproximation(registry)
 
 
 
-run_test_cases(20, 2)
+run_test_cases(50, 2)
