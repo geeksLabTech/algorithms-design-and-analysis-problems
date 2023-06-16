@@ -3,7 +3,10 @@ import random
 import numpy as np
 from utils import Student
 from naive import solve
-
+from ant_colony import solve_with_aproximation
+import seaborn as sns
+import matplotlib.pyplot as plt
+import pandas as pd
 
 def generator(cases: int):
     generated_cases: list[tuple[list[Student], int]] = []
@@ -42,13 +45,35 @@ def verify_solution(students: list[Student], k: int, result: list[int]):
 
     return True
 
+def compare_aproximation(data):
+    dataframe = pd.DataFrame(data, columns=['Tests', 'BruteForce', 'Aproximation'])
+    sns.set_theme(style="whitegrid")
+
+    # Initialize the matplotlib figure
+    f, ax = plt.subplots(figsize=(6, 15))
+
+    sns.set_color_codes("pastel")
+    sns.barplot(x="BruteForce", y="Tests", data=dataframe,
+                label="Total", color="b")
+
+    sns.set_color_codes("muted")
+    sns.barplot(x="Aproximation", y="Tests", data=dataframe,
+                label="Aproximation", color="b")
+
+    ax.legend(ncol=2, loc="lower right", frameon=True)
+    ax.set(xlim=(0, 24), ylabel="",
+    )
+    sns.despine(left=True, bottom=True)
+
 
 def run_test_cases(cases: int, seed: int):
     generated_test = generator(cases)
     bad_solutions = 0
-    for t in generated_test:
+    registry: list[list] = []
+    for i, t in enumerate(generated_test):
         print(f"starting solve for {len(t[0])} students and k: {t[1]}")
         solution = solve(t[0], t[1])
+        
         r = verify_solution(t[0], t[1], solution[1])
 
         if r is False:
@@ -57,11 +82,16 @@ def run_test_cases(cases: int, seed: int):
         if r is True and solution[0] == t[1]:
             print(f"k matched")
 
+        aproximation = solve_with_aproximation(t[0], t[1])
+        registry.append([i, solution[0], aproximation[0]])
     if bad_solutions > 0:
         print(f"bad solutions finded: {bad_solutions}")
 
     else:
         print("yeah, all seems good")
+
+    compare_aproximation(registry)
+
 
 
 run_test_cases(20, 2)
