@@ -55,6 +55,21 @@ class Node:
         return hash(self.id)
 
 
+def build_graph(students: list[Student], k: int) -> list[Node]:
+    total_nodes_ids = set(s.id for s in students)
+    nodes = [Node(s.id, total_nodes_ids) for s in students]
+
+    # Add_negative_edges_to_nodes
+    for i in range(len(nodes)):
+        for j in range(len(students[i].opinions)):
+            nodes[i].add_edge(nodes[students[i].opinions[j]], True)
+
+    # Add_neutral_edges_to_nodes
+    for node in nodes:
+        node.add_neutral_edges(nodes)
+
+    return nodes
+
 def add_node_to_solution(
     node: Node,
     current_nodes: list[Node],
@@ -64,15 +79,12 @@ def add_node_to_solution(
     nodes_to_process: list[Node] = []
     nodes_to_process.append(node)
     while len(nodes_to_process) > 0:
-        # print(len(nodes_to_process))
         current = nodes_to_process.pop()
         if mask[current.id]:
             continue
 
         mask[current.id] = True
         current_nodes.append(current)
-        # edges_for_print = [(e.source.id, e.dest.id, e.is_negative) for e in current.edges]
-        # print('look edges: ',  edges_for_print)
         nodes_that_think_negative = [
             e.source for e in current.edges if e.dest == current and e.is_negative
         ]

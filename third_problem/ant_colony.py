@@ -1,4 +1,4 @@
-from utils import Node, add_node_to_solution, remove_node_from_solution
+from utils import Node, add_node_to_solution, remove_node_from_solution, build_graph, Student
 import random
 
 
@@ -12,7 +12,7 @@ class AntClique:
         taomax=4,
         alpha=2,
         rho=0.995,
-        max_cycles=3000,
+        max_cycles=100,
     ):
         self.num_ants = num_ants
         self.taomin = taomin
@@ -99,7 +99,22 @@ class AntClique:
         return False
 
     def run(self):
-        pass
+        for iteration in range(self.max_cycles):
+            cliques = [self.build_clique() for j in range(self.num_ants)]
+            self.update_pheromone_trails(cliques)
+
+        return len(self.best_clique), self.best_clique
+        
 
     def __get_pheromone_factor(self, node: Node, candidates: set[Node]):
         return sum([e.pheromone for e in node.get_outgoing_edges() if e in candidates])
+
+
+def solve_with_aproximation(students: list[Student], k: int) -> tuple[int, list[Node]]:
+    nodes = build_graph(students, k)
+    ant_clique = AntClique(nodes, k)
+    solution = ant_clique.run()
+    print(f'best k by ants: {solution[0]}')
+    print(f'best clique by ants: {solution[1]}')
+
+    return solution
