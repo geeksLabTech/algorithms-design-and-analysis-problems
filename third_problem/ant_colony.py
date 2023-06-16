@@ -12,7 +12,7 @@ class AntClique:
         taomax=4,
         alpha=2,
         rho=0.995,
-        max_cycles=100,
+        max_cycles=50,
     ):
         self.num_ants = num_ants
         self.taomin = taomin
@@ -36,16 +36,22 @@ class AntClique:
         mask = [False] * len(self.nodes)
         dependencies = {}
         current_best_nodes: set[Node] = set()
-        while not finded_initial_valid_node:
-            initial_node: Node = random.sample(self.nodes, 1)[0]
+        random_starts = random.sample(self.nodes, len(self.nodes))
+        i = 0
+        while not finded_initial_valid_node and i < len(random_starts):
+            initial_node: Node = random_starts[i]
             mask = [False] * len(self.nodes)
             starting_nodes, mask, dependencies = add_node_to_solution(
                 initial_node, [], mask, {}
             )
             if len(starting_nodes) > self.target_k:
+                i += 1
                 continue
 
             finded_initial_valid_node = True
+
+        if not finded_initial_valid_node:
+            return set()
 
         selected_nodes = set()
         for x in starting_nodes:
@@ -100,6 +106,7 @@ class AntClique:
 
     def run(self):
         for iteration in range(self.max_cycles):
+            # print(f'iteration {iteration}')
             cliques = [self.build_clique() for j in range(self.num_ants)]
             self.update_pheromone_trails(cliques)
 
@@ -115,6 +122,6 @@ def solve_with_aproximation(students: list[Student], k: int) -> tuple[int, list[
     ant_clique = AntClique(nodes, k)
     solution = ant_clique.run()
     print(f'best k by ants: {solution[0]}')
-    print(f'best clique by ants: {solution[1]}')
+    # print(f'best clique by ants: {solution[1]}')
 
     return solution
